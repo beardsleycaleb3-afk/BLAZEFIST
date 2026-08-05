@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flaming Fighter Mobile Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            touch-action: none;
+            overflow: hidden;
+            user-select: none;
+        }
+        canvas {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        .retro-glow {
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.8), 0 0 20px rgba(249, 115, 22, 0.6);
+        }
+    </style>
+</head>
+<body class="w-screen h-screen flex flex-col justify-between items-center select-none overflow-hidden m-0 p-0">
+
+    <header class="w-full bg-slate-900/90 border-b border-slate-800 p-2 sm:p-3 flex justify-between items-center z-10">
+        <div class="flex items-center space-x-2">
+            <span class="text-xs uppercase font-bold tracking-wider text-red-400">Player 1</span>
+            <div class="w-24 sm:w-40 h-4 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                <div id="p1-health" class="h-full bg-gradient-to-r from-orange-500 to-red-500 w-full transition-all duration-150"></div>
+            </div>
+            <span id="p1-meter" class="text-xs font-black text-amber-400">FLAME: 0%</span>
+        </div>
+
+        <div class="flex flex-col items-center">
+            <div class="flex items-center space-x-2">
+                <h1 class="text-xs sm:text-sm font-extrabold text-amber-400 retro-glow uppercase tracking-widest">Street Clash</h1>
+                <!-- Stage Picker Dropdown -->
+                <select id="stage-selector" class="bg-slate-800 text-slate-200 text-xs px-2 py-1 rounded border border-slate-700 focus:outline-none focus:border-amber-400">
+                    <option value="1">Stage 1: Arena</option>
+                    <option value="2">Stage 2: Temple</option>
+                    <option value="3">Stage 3: Monster Stage</option>
+                    <option value="4">Stage 4: Enchanted Forest</option>
+                    <option value="5">Stage 5: Ruins</option>
+                    <option value="6">Stage 6: Mystic Elephants</option>
+                    <option value="7">Stage 7: Cavern</option>
+                    <option value="8">Stage 8: Dungeon</option>
+                    <option value="9" selected>Stage 9: Tavern</option>
+                </select>
+            </div>
+            <div id="match-timer" class="text-sm sm:text-base font-black text-slate-100 mt-0.5">99</div>
+        </div>
+
+        <div class="flex items-center space-x-2 flex-row-reverse">
+            <span class="text-xs uppercase font-bold tracking-wider text-blue-400">CPU</span>
+            <div class="w-24 sm:w-40 h-4 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                <div id="p2-health" class="h-full bg-gradient-to-r from-blue-500 to-cyan-500 w-full transition-all duration-150"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative flex-1 w-full flex justify-center items-center bg-black overflow-hidden">
+        <canvas id="gameCanvas" class="w-full h-full object-cover"></canvas>
+
+        <!-- Floating Action Notification Banner -->
+        <div id="action-banner" class="absolute top-10 left-1/2 transform -translate-x-1/2 pointer-events-none text-center transition-all opacity-0 scale-75 z-10">
+            <h3 id="banner-text" class="text-2xl sm:text-4xl font-black text-amber-400 retro-glow tracking-wider uppercase">TIGER FLAME</h3>
+            <p id="banner-sub" class="text-sm font-bold text-white tracking-widest">3 HITS</p>
+        </div>
+
+        <div id="message-overlay" class="absolute inset-0 bg-black/70 flex flex-col justify-center items-center hidden z-20">
+            <h2 id="overlay-title" class="text-3xl sm:text-5xl font-black text-amber-400 retro-glow mb-4 animate-bounce">VICTORY</h2>
+            <button onclick="resetGame()" class="px-6 py-3 bg-red-600 hover:bg-red-500 active:scale-95 text-white font-bold rounded-xl shadow-lg border border-red-400 transition-all">Play Again</button>
+        </div>
+    </main>
+
+    <footer class="w-full bg-slate-900/90 border-t border-slate-800 p-3 sm:p-4 flex justify-between items-center z-10 select-none">
+        <div class="flex space-x-2">
+            <button id="btn-left" class="w-14 h-14 sm:w-16 sm:h-16 bg-slate-800 active:bg-slate-700 active:scale-95 border border-slate-700 rounded-2xl flex justify-center items-center text-slate-200 text-xl font-bold shadow-md">
+                ◀
+            </button>
+            <button id="btn-right" class="w-14 h-14 sm:w-16 sm:h-16 bg-slate-800 active:bg-slate-700 active:scale-95 border border-slate-700 rounded-2xl flex justify-center items-center text-slate-200 text-xl font-bold shadow-md">
+                ▶
+            </button>
+            <button id="btn-crouch" class="w-14 h-14 sm:w-16 sm:h-16 bg-slate-800 active:bg-slate-700 active:scale-95 border border-slate-700 rounded-2xl flex justify-center items-center text-slate-200 text-xs font-bold shadow-md">
+                CROUCH
+            </button>
+        </div>
+
+        <div class="grid grid-cols-4 gap-1.5 sm:gap-2">
+            <button id="btn-punch" class="w-11 h-11 sm:w-14 sm:h-14 bg-red-900/60 active:bg-red-700 active:scale-95 border border-red-600/50 rounded-xl flex justify-center items-center text-red-200 text-[10px] sm:text-xs font-bold shadow">
+                PUNCH
+            </button>
+            <button id="btn-kick" class="w-11 h-11 sm:w-14 sm:h-14 bg-orange-900/60 active:bg-orange-700 active:scale-95 border border-orange-600/50 rounded-xl flex justify-center items-center text-orange-200 text-[10px] sm:text-xs font-bold shadow">
+                KICK
+            </button>
+            <button id="btn-jump" class="w-11 h-11 sm:w-14 sm:h-14 bg-amber-900/60 active:bg-amber-700 active:scale-95 border border-amber-600/50 rounded-xl flex justify-center items-center text-amber-200 text-[10px] sm:text-xs font-bold shadow">
+                JUMP
+            </button>
+            <button id="btn-special" class="w-11 h-11 sm:w-14 sm:h-14 bg-yellow-600 active:bg-yellow-500 active:scale-95 border border-yellow-400 rounded-xl flex justify-center items-center text-black text-[10px] sm:text-xs font-extrabold shadow animate-pulse">
+                ULTRA
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let gameState = 'PLAYING';
+        let matchTimer = 99;
+        setInterval(() => {
+            if (gameState === 'PLAYING' && matchTimer > 0) {
+                matchTimer--;
+                document.getElementById('match-timer').innerText = matchTimer;
+                if (matchTimer === 0) checkGameOver(true);
+            }
+        }, 1000);
+
+        // Map stage backgrounds corresponding to stage1 through stage9
+        const stageImages = {};
+        for (let i = 1; i <= 9; i++) {
+            const img = new Image();
+            img.src = `https://raw.githubusercontent.com/beardsleycaleb-afk/main/fight/assets/sprites/stages/backgrounds/stage${i}.png`;
+            img.onerror = () => {
+                img.src = `https://placehold.co/1280x720/1e293b/ef4444?text=Stage+${i}+Arena`;
+            };
+            stageImages[i] = img;
+        }
+
+        let currentStageId = 9;
+        document.getElementById('stage-selector').addEventListener('change', (e) => {
+            currentStageId = parseInt(e.target.value);
+        });
+
+        function showActionBanner(text, sub) {
+            const banner = document.getElementById('action-banner');
+            document.getElementById('banner-text').innerText = text;
+            document.getElementById('banner-sub').innerText = sub;
+            banner.classList.remove('opacity-0', 'scale-75');
+            banner.classList.add('opacity-100', 'scale-100');
+            setTimeout(() => {
+                banner.classList.remove('opacity-100', 'scale-100');
+                banner.classList.add('opacity-0', 'scale-75');
+            }, 1200);
+        }
+
+        class Fighter {
+            constructor(x, y, isAI = false) {
+                this.x = x;
+                this.y = y;
+                this.width = 110;
+                this.height = 150;
+                this.vx = 0;
+                this.vy = 0;
+                this.speed = 5;
+                this.health = 100;
+                this.maxHealth = 100;
+                this.meter = 0;
+                this.isAI = isAI;
+                this.state = 'idle'; // idle, run, jump, punch, kick, crouch, hit, special
+                this.frameIndex = 0;
+                this.frameTimer = 0;
+                this.isGrounded = true;
+                this.isTransformed = false;
+                this.comboCount = 0;
+            }
+
+            update(opponent) {
+                if (!this.isGrounded) {
+                    this.vy += 0.6;
+                    this.y += this.vy;
+                    if (this.y >= canvas.height - 210) {
+                        this.y = canvas.height - 210;
+                        this.isGrounded = true;
+                        this.vy = 0;
+                        if (this.state === 'jump') this.state = 'idle';
+                    }
+                }
+
+                this.x += this.vx;
+                if (this.x < 20) this.x = 20;
+                if (this.x > canvas.width - this.width - 20) this.x = canvas.width - this.width - 20;
+
+                if (this.isAI && gameState === 'PLAYING') {
+                    const dist = this.x - opponent.x;
+                    if (Math.abs(dist) > 110) {
+                        this.vx = dist > 0 ? -2.5 : 2.5;
+                        this.state = 'run';
+                    } else {
+                        this.vx = 0;
+                        this.state = 'idle';
+                        if (Math.random() < 0.025) {
+                            const moves = ['punch', 'kick', 'hurricane', 'special'];
+                            this.attack(moves[Math.floor(Math.random() * moves.length)], opponent);
+                        }
+                    }
+                }
+
+                this.frameTimer++;
+                if (this.frameTimer > 5) {
+                    this.frameTimer = 0;
+                    this.frameIndex++;
+                    if (this.frameIndex >= 8) {
+                        this.frameIndex = 0;
+                        if (['punch', 'kick', 'hit', 'hurricane', 'special'].includes(this.state)) {
+                            this.state = 'idle';
+                        }
+                    }
+                }
+            }
+
+            attack(type, opponent) {
+                if (['punch', 'kick', 'hurricane', 'special'].includes(this.state)) return;
+                this.state = type;
+                this.frameIndex = 0;
+
+                let damage = 8;
+                let hits = 1;
+
+                if (type === 'punch') {
+                    damage = 8;
+                    hits = 1;
+                    showActionBanner("PUNCH", "1 HIT");
+                } else if (type === 'kick') {
+                    damage = 12;
+                    hits = 1;
+                    showActionBanner("KICK", "1 HIT");
+                } else if (type === 'hurricane') {
+                    damage = 22;
+                    hits = 16;
+                    showActionBanner("HURRICANE KICK", "16 HITS");
+                } else if (type === 'special') {
+                    if (this.meter < 100 && !this.isAI) {
+                        this.state = 'idle';
+                        return;
+                    }
+                    this.meter = 0;
+                    this.isTransformed = true;
+                    damage = 35;
+                    hits = 1;
+                    showActionBanner("TIGER FLAME FINISHER!", "ULTRA MOVE");
+                }
+
+                const hitDistance = 120;
+                if (Math.abs(this.x - opponent.x) < hitDistance) {
+                    opponent.takeDamage(damage, hits);
+                    this.meter = Math.min(100, this.meter + 25);
+                }
+                if (!this.isAI) {
+                    document.getElementById('p1-meter').innerText = `FLAME: ${this.meter}%`;
+                }
+            }
+
+            takeDamage(amount, hits = 1) {
+                this.health = Math.max(0, this.health - amount);
+                this.state = 'hit';
+                this.frameIndex = 0;
+                updateHealthBars();
+                checkGameOver();
+            }
+
+            draw() {
+                ctx.save();
+                
+                // Ground Tiger Spirit Aura when transformed
+                if (this.isTransformed) {
+                    ctx.fillStyle = 'rgba(245, 158, 11, 0.35)';
+                    ctx.beginPath();
+                    ctx.ellipse(this.x + this.width/2, canvas.height - 50, this.width/1.5, 20, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                    ctx.beginPath();
+                    ctx.ellipse(this.x + this.width/2, canvas.height - 50, this.width/3, 10, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                let drawHeight = this.height;
+                let drawY = this.y;
+                if (this.state === 'crouch') {
+                    drawHeight = 90;
+                    drawY = this.y + 60;
+                }
+
+                // Fighter Body Sprite Simulation with Flame Aura colors
+                ctx.fillStyle = this.isTransformed ? '#f59e0b' : (this.isAI ? '#2563eb' : '#dc2626');
+                ctx.fillRect(this.x, drawY, this.width, drawHeight);
+
+                // Head and outfit highlights
+                ctx.fillStyle = this.isTransformed ? '#fef08a' : (this.isAI ? '#93c5fd' : '#fca5a5');
+                ctx.fillRect(this.x + 15, drawY + 15, this.width - 30, 25);
+
+                // Tiger stripes effect if transformed
+                if (this.isTransformed) {
+                    ctx.fillStyle = '#78350f';
+                    ctx.fillRect(this.x + 25, drawY + 50, 15, 8);
+                    ctx.fillRect(this.x + 65, drawY + 65, 15, 8);
+                    ctx.fillRect(this.x + 35, drawY + 90, 15, 8);
+                }
+
+                // Attack limb extensions & effects
+                if (this.state === 'punch') {
+                    ctx.fillStyle = this.isTransformed ? '#ea580c' : (this.isAI ? '#1d4ed8' : '#b91c1c');
+                    const punchDir = this.isAI ? -35 : this.width;
+                    ctx.fillRect(this.x + punchDir, drawY + 45, 40, 16);
+                } else if (this.state === 'kick' || this.state === 'hurricane') {
+                    ctx.fillStyle = this.isTransformed ? '#ea580c' : (this.isAI ? '#1d4ed8' : '#b91c1c');
+                    const kickDir = this.isAI ? -45 : this.width;
+                    ctx.fillRect(this.x + kickDir, drawY + 85, 50, 18);
+                } else if (this.state === 'special') {
+                    ctx.fillStyle = '#fef08a';
+                    ctx.beginPath();
+                    ctx.arc(this.x + this.width/2, drawY + drawHeight/2, 60, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        const player = new Fighter(100, canvas.height - 210, false);
+        const cpu = new Fighter(canvas.width - 210, canvas.height - 210, true);
+
+        function updateHealthBars() {
+            document.getElementById('p1-health').style.width = `${(player.health / player.maxHealth) * 100}%`;
+            document.getElementById('p2-health').style.width = `${(cpu.health / cpu.maxHealth) * 100}%`;
+        }
+
+        function checkGameOver(timeOut = false) {
+            if (player.health <= 0 || cpu.health <= 0 || timeOut) {
+                gameState = 'GAMEOVER';
+                const overlay = document.getElementById('message-overlay');
+                const title = document.getElementById('overlay-title');
+                overlay.classList.remove('hidden');
+                if (player.health > cpu.health) {
+                    title.innerText = "VICTORY!";
+                    title.className = "text-3xl sm:text-5xl font-black text-amber-400 retro-glow mb-4 animate-bounce";
+                } else {
+                    title.innerText = "DEFEAT";
+                    title.className = "text-3xl sm:text-5xl font-black text-red-500 retro-glow mb-4 animate-bounce";
+                }
+            }
+        }
+
+        function resetGame() {
+            player.health = 100;
+            player.x = 100;
+            player.meter = 0;
+            player.isTransformed = false;
+            cpu.health = 100;
+            cpu.x = canvas.width - 210;
+            matchTimer = 99;
+            gameState = 'PLAYING';
+            document.getElementById('message-overlay').classList.add('hidden');
+            document.getElementById('match-timer').innerText = matchTimer;
+            document.getElementById('p1-meter').innerText = `FLAME: 0%`;
+            updateHealthBars();
+        }
+
+        const setupButton = (id, actionStart, actionEnd) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('touchstart', (e) => { e.preventDefault(); actionStart(); });
+            el.addEventListener('touchend', (e) => { e.preventDefault(); if(actionEnd) actionEnd(); });
+            el.addEventListener('mousedown', (e) => { e.preventDefault(); actionStart(); });
+            el.addEventListener('mouseup', (e) => { e.preventDefault(); if(actionEnd) actionEnd(); });
+        };
+
+        setupButton('btn-left', () => { player.vx = -player.speed; player.state = 'run'; }, () => { player.vx = 0; player.state = 'idle'; });
+        setupButton('btn-right', () => { player.vx = player.speed; player.state = 'run'; }, () => { player.vx = 0; player.state = 'idle'; });
+        setupButton('btn-jump', () => {
+            if (player.isGrounded) {
+                player.vy = -14;
+                player.isGrounded = false;
+                player.state = 'jump';
+            }
+        });
+        setupButton('btn-punch', () => { player.attack('punch', cpu); });
+        setupButton('btn-kick', () => { player.attack('kick', cpu); });
+        setupButton('btn-special', () => { player.attack('special', cpu); });
+        setupButton('btn-crouch', () => { player.state = 'crouch'; }, () => { player.state = 'idle'; });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') { player.vx = -player.speed; player.state = 'run'; }
+            if (e.key === 'ArrowRight') { player.vx = player.speed; player.state = 'run'; }
+            if (e.key === 'ArrowUp' && player.isGrounded) { player.vy = -14; player.isGrounded = false; player.state = 'jump'; }
+            if (e.key === 'ArrowDown') { player.state = 'crouch'; }
+            if (e.key === 'z' || e.key === 'j') { player.attack('punch', cpu); }
+            if (e.key === 'x' || e.key === 'k') { player.attack('kick', cpu); }
+            if (e.key === 'c' || e.key === 'l') { player.attack('hurricane', cpu); }
+            if (e.key === ' ') { player.attack('special', cpu); }
+        });
+        window.addEventListener('keyup', (e) => {
+            if (['ArrowLeft', 'ArrowRight'].includes(e.key)) { player.vx = 0; player.state = 'idle'; }
+            if (e.key === 'ArrowDown') { player.state = 'idle'; }
+        });
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const currentBg = stageImages[currentStageId];
+            if (currentBg && currentBg.complete) {
+                ctx.drawImage(currentBg, 0, 0, canvas.width, canvas.height);
+            } else {
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            player.update(cpu);
+            cpu.update(player);
+
+            player.draw();
+            cpu.draw();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        window.onload = function() {
+            updateHealthBars();
+            gameLoop();
+        };
+    </script>
+</body>
+</html>
