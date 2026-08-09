@@ -2,217 +2,290 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link rel="manifest" href="./manifest.json">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#000000" />
-  <title>fight</title>
+  <title>Tiger Blaze: Street Inferno</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; touch-action: none; }
-    html, body { width: 100dvw; height: 100dvh; overflow: hidden; background: #000; font-family: system-ui, sans-serif; }
-    body { position: fixed; inset: 0; }
+    :root {
+      --bg: #06060b;
+      --panel: rgba(12, 14, 22, 0.92);
+      --accent: #ff7a00;
+      --accent-2: #ffcc33;
+      --text: #fef7cc;
+      --muted: #a6a1b7;
+    }
 
-    #app { width: 100dvw; height: 100dvh; display: flex; flex-direction: column; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; touch-action: none; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--text); }
+    body { display: grid; place-items: center; }
+
+    body.android-only { background: radial-gradient(circle at top, #22120a, #06060b 70%); }
+
+    #app {
+      width: min(100vw, 440px);
+      height: min(100dvh, 900px);
+      max-width: 440px;
+      max-height: 900px;
+      display: flex;
+      flex-direction: column;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.55);
+      background: var(--bg);
+      position: relative;
+    }
 
     #screen {
       position: relative;
-      flex: 1 1 auto;
-      min-height: 58dvh;
-      background: linear-gradient(180deg, #10101a, #050508);
-      border-bottom: 2px solid #1e1e2a;
-      overflow: hidden;
+      flex: 1;
+      min-height: 0;
+      background: linear-gradient(180deg, #13151f 0%, #06070e 100%);
     }
 
-    #hud {
+    canvas {
       position: absolute;
-      top: 8px;
-      left: 8px;
-      right: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 5;
-      color: #fff;
-      font-size: 12px;
-      pointer-events: none;
-    }
-
-    .barWrap { width: 38%; }
-    .label { font-size: 10px; margin-bottom: 4px; opacity: .9; }
-    .bar {
+      inset: 0;
       width: 100%;
-      height: 8px;
-      background: rgba(255,255,255,.12);
-      border: 1px solid rgba(255,255,255,.15);
-      overflow: hidden;
-      border-radius: 2px;
+      height: 100%;
+      image-rendering: auto;
     }
-    .fill { height: 100%; width: 100%; }
-    #p1fill { background: linear-gradient(90deg, #29ff6a, #0a8f2f); }
-    #p2fill { background: linear-gradient(90deg, #ff4a4a, #8f0000); }
 
-    #scoreBox { text-align: center; min-width: 78px; }
-    #score { font-size: 18px; color: #ffd400; text-shadow: 0 0 10px #ff6a00; }
-    #timer { font-size: 14px; color: #fff; }
-
-    #message {
-      position: absolute;
-      left: 50%;
-      top: 45%;
-      transform: translate(-50%, -50%);
-      color: #ffd400;
-      font-size: 22px;
-      font-weight: 800;
-      text-shadow: 0 0 16px #ff6a00;
+    #collisionCanvas {
       opacity: 0;
-      z-index: 6;
       pointer-events: none;
-    }
-    #message.show { animation: pop .7s ease-out; }
-    @keyframes pop {
-      0% { opacity: 1; transform: translate(-50%, -50%) scale(.4); }
-      50% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
-      100% { opacity: 0; transform: translate(-50%, -95%) scale(.9); }
+      z-index: 1;
     }
 
-    #controls {
-      flex: 0 0 42dvh;
+    #game {
+      z-index: 2;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 15;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 16px;
-      background: linear-gradient(180deg, #090912, #050508);
-      gap: 16px;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(4px);
     }
 
-    #dpad {
-      width: 132px;
-      height: 132px;
-      display: grid;
-      grid-template-columns: repeat(3, 44px);
-      grid-template-rows: repeat(3, 44px);
+    .panel {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .hero-title {
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+      font-size: 12px;
+      color: var(--accent-2);
+      margin-bottom: 6px;
+    }
+
+    h1 { font-size: 24px; line-height: 1.1; margin-bottom: 8px; }
+    .subtitle { color: var(--muted); font-size: 13px; line-height: 1.4; margin-bottom: 12px; }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,122,0,0.18);
+      color: #ffd4a6;
+      font-size: 11px;
+      font-weight: 700;
+      margin-right: 6px;
+      margin-bottom: 6px;
     }
 
     .btn {
-      border: 1px solid rgba(255,255,255,.14);
-      background: radial-gradient(circle at 35% 35%, #2a2a44, #10101f);
-      color: #fff;
-      border-radius: 50%;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
-      box-shadow: 0 4px 0 #000;
-    }
-
-    .btn:active, .btn.on {
-      transform: translateY(3px) scale(.92);
-      filter: brightness(1.5);
-      box-shadow: 0 1px 0 #000;
-    }
-
-    #up { grid-column: 2; grid-row: 1; }
-    #left { grid-column: 1; grid-row: 2; }
-    #center { grid-column: 2; grid-row: 2; background: transparent; box-shadow: none; }
-    #right { grid-column: 3; grid-row: 2; }
-    #down { grid-column: 2; grid-row: 3; }
-
-    #actions {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      align-items: center;
-    }
-
-    .action {
-      width: 68px;
-      height: 68px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #ff7a00, #b12a00);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 14px;
       font-weight: 800;
-      box-shadow: 0 5px 0 #4a1000;
+      color: white;
+      background: linear-gradient(135deg, var(--accent), #b11f00);
+      box-shadow: 0 8px 18px rgba(255,122,0,0.25);
+      min-width: 110px;
     }
 
-    .action.run { background: radial-gradient(circle at 35% 35%, #1ca34a, #0b381a); box-shadow: 0 5px 0 #06160a; }
-    .action:active, .action.on { transform: translateY(4px) scale(.92); box-shadow: 0 1px 0 #000; }
+    .btn.alt { background: linear-gradient(135deg, #0f5b8c, #0e2142); box-shadow: none; }
 
-    #overlay {
+    .hud {
       position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,.72);
+      inset: 0 0 auto 0;
+      padding: 12px;
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    .hud-card {
+      background: rgba(4, 6, 12, 0.55);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 8px 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.16em; }
+    .bar {
+      height: 8px; border-radius: 999px; background: rgba(255,255,255,0.14); overflow: hidden; margin-top: 5px;
+    }
+    .fill { height: 100%; width: 100%; background: linear-gradient(90deg, #2dff7c, #0b8a3f); transition: width 120ms linear; }
+    .fill.enemy { background: linear-gradient(90deg, #ff4a4a, #9a0000); }
+
+    .dialogue {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      z-index: 7;
+      background: rgba(5, 7, 12, 0.78);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 16px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #fff6d2;
+    }
+
+    .dialogue strong { color: var(--accent-2); }
+
+    #controls {
+      flex: 0 0 232px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      background: linear-gradient(180deg, #06070e, #0c0f18);
+      border-top: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .controls-left, .controls-right { display: grid; gap: 10px; }
+    .controls-left { grid-template-columns: repeat(2, 1fr); }
+    .controls-right { grid-template-columns: 1fr; }
+
+    .ctrl {
+      border: 1px solid rgba(255,255,255,0.14);
+      background: radial-gradient(circle at 35% 35%, #2a2a44, #111225 70%);
+      color: #fff;
+      border-radius: 18px;
+      height: 70px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      color: #fff;
-      z-index: 10;
-      text-align: center;
-      gap: 12px;
-    }
-
-    #overlay h1 { font-size: 34px; color: #ffd400; text-shadow: 0 0 18px #ff6a00; }
-    #overlay p { font-size: 12px; opacity: .85; }
-    #overlay button {
-      padding: 12px 18px;
-      border: 0;
-      border-radius: 6px;
-      background: #ff6a00;
-      color: #fff;
+      font-size: 16px;
       font-weight: 800;
-      font-size: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 6px 14px rgba(0,0,0,0.28);
+    }
+    .ctrl.active { transform: scale(0.96); filter: brightness(1.18); }
+    .ctrl.attack { background: radial-gradient(circle at 35% 35%, #ff7a00, #b11f00); }
+    .ctrl.special { background: radial-gradient(circle at 35% 35%, #1ca34a, #0b401d); }
+
+    .roster {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 8;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-width: 110px;
     }
 
-    canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+    .roster-card {
+      padding: 7px 8px;
+      border-radius: 12px;
+      background: rgba(8, 10, 18, 0.8);
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 10px;
+      line-height: 1.3;
+      color: var(--muted);
+    }
+    .roster-card.active { color: #fff7d0; border-color: rgba(255,122,0,0.4); }
+    .roster-card.unlocked { color: #fff4c6; border-color: rgba(255,204,51,0.35); }
+
+    .small { font-size: 10px; color: var(--muted); }
+    @media (max-height: 720px) {
+      #controls { flex-basis: 210px; padding: 10px; }
+      .ctrl { height: 62px; }
+    }
   </style>
 </head>
-<body>
+<body class="android-only">
   <div id="app">
     <div id="screen">
+      <canvas id="collisionCanvas"></canvas>
       <canvas id="game"></canvas>
 
-      <div id="hud">
-        <div class="barWrap">
-          <div class="label">PLAYER</div>
-          <div class="bar"><div class="fill" id="p1fill"></div></div>
-        </div>
+      <div class="roster" id="roster"></div>
 
-        <div id="scoreBox">
-          <div id="score">000000</div>
-          <div id="timer">99</div>
+      <div class="hud">
+        <div class="hud-card">
+          <div class="label">Tiger Blaze</div>
+          <div class="bar"><div id="p1bar" class="fill"></div></div>
         </div>
-
-        <div class="barWrap" style="text-align:right;">
-          <div class="label">ENEMY</div>
-          <div class="bar"><div class="fill" id="p2fill"></div></div>
+        <div class="hud-card">
+          <div class="label">Rival</div>
+          <div class="bar"><div id="p2bar" class="fill enemy"></div></div>
         </div>
       </div>
 
-      <div id="message"></div>
+      <div id="dialogue" class="dialogue">
+        <strong>STREET INFERNO</strong><br />
+        The city is shaking. Blaze Tiger must stop the shadow circuit before the midnight arena erupts.
+      </div>
 
-      <div id="overlay">
-        <h1>fight</h1>
-        <p>Touch PLAY to start</p>
-        <button id="playBtn">PLAY</button>
+      <div id="introOverlay" class="overlay">
+        <div class="panel">
+          <div class="hero-title">Android touch fighter</div>
+          <h1>Tiger Blaze: Street Inferno</h1>
+          <p class="subtitle">A fast, touch-only street fighter built around the fire hero. Follow the story, fight the roster, unlock new powers, and turn Blaze Tiger into a legend.</p>
+          <div style="margin-bottom: 10px;">
+            <span class="pill">Story mode</span>
+            <span class="pill">Dialogue</span>
+            <span class="pill">Unlockables</span>
+            <span class="pill">Touch controls</span>
+          </div>
+          <button id="startBtn" class="btn">Start Journey</button>
+        </div>
+      </div>
+
+      <div id="endOverlay" class="overlay" style="display:none;">
+        <div class="panel">
+          <div class="hero-title">Victory</div>
+          <h1 id="endTitle">You won the night</h1>
+          <p id="endText" class="subtitle"></p>
+          <button id="nextBtn" class="btn">Continue</button>
+        </div>
       </div>
     </div>
 
     <div id="controls">
-      <div id="dpad">
-        <div class="btn" id="up">▲</div>
-        <div class="btn" id="left">◀</div>
-        <div class="btn" id="center"></div>
-        <div class="btn" id="right">▶</div>
-        <div class="btn" id="down">▼</div>
+      <div class="controls-left">
+        <div class="ctrl" id="leftBtn">◀</div>
+        <div class="ctrl" id="rightBtn">▶</div>
+        <div class="ctrl attack" id="attackBtn">HIT</div>
+        <div class="ctrl special" id="specialBtn">BURST</div>
       </div>
-
-      <div id="actions">
-        <div class="action run" id="runBtn">RUN</div>
-        <div class="action" id="attackBtn">HIT</div>
+      <div class="controls-right">
+        <div class="ctrl" id="jumpBtn">JUMP</div>
+        <div class="ctrl" id="guardBtn">GUARD</div>
       </div>
     </div>
   </div>
@@ -220,251 +293,355 @@
   <script>
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
+    const collisionCanvas = document.getElementById('collisionCanvas');
+    const collisionCtx = collisionCanvas.getContext('2d');
+    const offscreenCanvas = document.createElement('canvas');
+    const offscreenCtx = offscreenCanvas.getContext('2d');
+    const introOverlay = document.getElementById('introOverlay');
+    const endOverlay = document.getElementById('endOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dialogueEl = document.getElementById('dialogue');
+    const rosterEl = document.getElementById('roster');
+    const p1bar = document.getElementById('p1bar');
+    const p2bar = document.getElementById('p2bar');
+    const endTitle = document.getElementById('endTitle');
+    const endText = document.getElementById('endText');
 
-    const ui = {
-      p1: document.getElementById('p1fill'),
-      p2: document.getElementById('p2fill'),
-      score: document.getElementById('score'),
-      timer: document.getElementById('timer'),
-      msg: document.getElementById('message'),
-      overlay: document.getElementById('overlay'),
-      playBtn: document.getElementById('playBtn')
-    };
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isApple = /iPhone|iPad|iPod|Mac/i.test(navigator.userAgent);
 
-    const input = { left:false, right:false, run:false };
-    let running = false;
-    let score = 0;
-    let timer = 99;
-    let p1hp = 100;
-    let p2hp = 100;
-    let x = 70, y = 180, vx = 0;
-    let ex = 260, ey = 180, evx = 0;
-
-    const SPRITE_BASE = './assets/sprites/fighter/flaming/east/';
-    const STAGE_BG = './assets/sprites/stages/backgrounds/stage1.png';
-
-    const ANIMS = {
-      idle: 'idle',
-      walk: 'walk',
-      run: 'run',
-      jump: 'jump',
-      jab: 'jab',
-      cross: 'cross',
-      punch: 'punch',
-      kick: 'kick',
-      uppercut: 'uppercut',
-      headbutt: 'headbutt',
-      roundhouse: 'roundhouse',
-      victory: 'victory'
-    };
-
-    const images = {};
-    function makeFrameUrl(action, frame) {
-      return `${SPRITE_BASE}${action}/frame_${String(frame).padStart(3, '0')}.png`;
+    if (!isAndroid || isApple) {
+      document.body.innerHTML = '<div style="display:grid;place-items:center;width:100%;height:100%;padding:20px;background:#06060b;color:#fff;font-family:sans-serif;text-align:center"><div style="max-width:320px"><h2>Android-only experience</h2><p style="margin-top:8px;line-height:1.5;color:#c5c0de">This build is tuned for Android touch screens. Open it on an Android device to play the full story mode.</p></div></div>';
     }
 
-    function loadImage(src) {
-      return new Promise(resolve => {
+    const heroFrames = { idle: [], walk: [], run: [], jump: [], jab: [], cross: [], punch: [], kick: [], uppercut: [], headbutt: [], roundhouse: [], victory: [] };
+    const spriteBase = './assets/sprites/fighter/flaming/east/';
+    const stageBase = './assets/sprites/stages/backgrounds/stage1.png';
+    const stageImg = new Image();
+
+    function makeFrameUrl(action, frame) {
+      return `${spriteBase}${action}/frame_${String(frame).padStart(3, '0')}.png`;
+    }
+
+    async function loadActionFrames(action, count) {
+      const frames = [];
+      for (let i = 0; i < count; i++) {
         const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = () => resolve(null);
-        img.src = src;
+        img.src = makeFrameUrl(action, i);
+        await new Promise(resolve => {
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+        });
+        if (img.naturalWidth) frames.push(img);
+      }
+      return frames;
+    }
+
+    async function preloadAssets() {
+      const actions = Object.keys(heroFrames);
+      for (const action of actions) {
+        heroFrames[action] = await loadActionFrames(action, action === 'victory' ? 8 : 8);
+      }
+      stageImg.src = stageBase;
+      await new Promise(resolve => {
+        stageImg.onload = resolve;
+        stageImg.onerror = resolve;
       });
     }
 
-    async function preloadSprites() {
-      const actions = Object.values(ANIMS);
-      for (const action of actions) {
-        images[action] = [];
-        for (let i = 0; i < 12; i++) {
-          const img = await loadImage(makeFrameUrl(action, i));
-          if (!img) break;
-          images[action].push(img);
-        }
-      }
-      images.stage = await loadImage(STAGE_BG);
-    }
+    const roster = [
+      { id: 'tiger', name: 'Tiger Blaze', role: 'Main Hero', intro: 'The city burns for a reason. Blaze Tiger carries the flame and the truth.', unlock: 'Flame Burst' },
+      { id: 'riven', name: 'Riven Volt', role: 'Electric Rivals', intro: 'Riven wants the crowd, the spotlight, and the final arena.', unlock: 'Volt Dash' },
+      { id: 'mira', name: 'Mira Flux', role: 'Shadow Chaser', intro: 'Mira fights for the lost souls buried under the midnight circuit.', unlock: 'Mirror Guard' },
+      { id: 'obsidian', name: 'Obsidian', role: 'The Last Boss', intro: 'A stone-hearted warlord who claims the city belongs to the dark.', unlock: 'Inferno Crown' }
+    ];
 
-    function resize() {
+    const unlocks = [];
+    let currentFight = 0;
+    let fightActive = false;
+    let fightTimer = 0;
+    let playerHp = 100;
+    let enemyHp = 100;
+    let playerX = 72;
+    let enemyX = 248;
+    let playerY = 360;
+    let enemyY = 360;
+    let playerDir = 1;
+    let enemyDir = -1;
+    let input = { left: false, right: false, guard: false, jump: false };
+    let attackQueued = false;
+    let specialQueued = false;
+    let enemyAttackTimer = 0;
+    let playerFrame = 0;
+    let playerFrameTimer = 0;
+    let enemyFrame = 0;
+    let enemyFrameTimer = 0;
+    let storyIndex = 0;
+    let victorySeen = false;
+
+    function resizeCanvas() {
       const dpr = Math.max(1, window.devicePixelRatio || 1);
-      canvas.width = Math.floor(canvas.clientWidth * dpr);
-      canvas.height = Math.floor(canvas.clientHeight * dpr);
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      collisionCanvas.width = Math.round(rect.width * dpr);
+      collisionCanvas.height = Math.round(rect.height * dpr);
+      offscreenCanvas.width = Math.round(rect.width * dpr);
+      offscreenCanvas.height = Math.round(rect.height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-    window.addEventListener('resize', resize);
-    resize();
-
-    function flash(text) {
-      ui.msg.textContent = text;
-      ui.msg.classList.remove('show');
-      void ui.msg.offsetWidth;
-      ui.msg.classList.add('show');
+      collisionCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      offscreenCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    function updateHUD() {
-      ui.p1.style.width = p1hp + '%';
-      ui.p2.style.width = p2hp + '%';
-      ui.score.textContent = String(score).padStart(6, '0');
-      ui.timer.textContent = String(timer).padStart(2, '0');
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function speak(text) {
+      dialogueEl.innerHTML = `<strong>${roster[currentFight].name}</strong><br />${text}`;
     }
 
-    function drawRect(x, y, w, h, c) {
-      ctx.fillStyle = c;
-      ctx.fillRect(x, y, w, h);
+    function renderRoster() {
+      rosterEl.innerHTML = '';
+      roster.forEach((fighter, idx) => {
+        const card = document.createElement('div');
+        card.className = 'roster-card' + (idx === currentFight ? ' active' : '') + (idx < currentFight ? ' unlocked' : '');
+        card.innerHTML = `${fighter.name}<div class="small">${fighter.role}</div>`;
+        rosterEl.appendChild(card);
+      });
     }
 
-    function render() {
+    function updateBars() {
+      p1bar.style.width = `${Math.max(0, playerHp)}%`;
+      p2bar.style.width = `${Math.max(0, enemyHp)}%`;
+    }
+
+    function drawBackground() {
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
-
       ctx.clearRect(0, 0, w, h);
-
-      if (images.stage) {
-        ctx.drawImage(images.stage, 0, 0, w, h);
+      offscreenCtx.clearRect(0, 0, w, h);
+      if (stageImg.complete) {
+        ctx.drawImage(stageImg, 0, 0, w, h);
+        offscreenCtx.drawImage(stageImg, 0, 0, w, h);
       } else {
-        const bg = ctx.createLinearGradient(0, 0, 0, h);
-        bg.addColorStop(0, '#16162a');
-        bg.addColorStop(1, '#050508');
-        ctx.fillStyle = bg;
+        const g = ctx.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, '#161723');
+        g.addColorStop(1, '#030406');
+        ctx.fillStyle = g;
         ctx.fillRect(0, 0, w, h);
+        offscreenCtx.fillStyle = g;
+        offscreenCtx.fillRect(0, 0, w, h);
       }
-
-      ctx.fillStyle = 'rgba(255,255,255,.03)';
-      for (let i = 0; i < h; i += 4) ctx.fillRect(0, i, w, 1);
-
-      ctx.fillStyle = '#444';
-      ctx.fillRect(0, h - 34, w, 34);
-
-      drawRect(x, y, 28, 48, '#3399ff');
-      drawRect(ex, ey, 28, 48, '#ff4444');
-
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(x + 6, y + 8, 6, 6);
-      ctx.fillRect(ex + 16, ey + 8, 6, 6);
+      ctx.fillStyle = 'rgba(255,255,255,0.04)';
+      for (let y = 0; y < h; y += 4) ctx.fillRect(0, y, w, 1);
+      offscreenCtx.fillStyle = 'rgba(255,255,255,0.04)';
+      for (let y = 0; y < h; y += 4) offscreenCtx.fillRect(0, y, w, 1);
+      ctx.fillStyle = 'rgba(0,0,0,0.25)';
+      ctx.fillRect(0, h - 64, w, 64);
+      offscreenCtx.fillStyle = 'rgba(0,0,0,0.25)';
+      offscreenCtx.fillRect(0, h - 64, w, 64);
+      ctx.fillStyle = 'rgba(255,255,255,0.16)';
+      ctx.fillRect(0, h - 64, w, 2);
+      offscreenCtx.fillStyle = 'rgba(255,255,255,0.16)';
+      offscreenCtx.fillRect(0, h - 64, w, 2);
     }
 
-    function loop() {
-      if (!running) return;
+    function drawFighterToContext(targetCtx, x, y, facing, tint, frameSet, frameIndex, isHero) {
+      const img = frameSet[frameIndex % Math.max(1, frameSet.length)] || frameSet[0];
+      if (!img) return;
+      const w = 92;
+      const h = 132;
+      const drawY = y - h + 6;
+      targetCtx.save();
+      if (tint) {
+        targetCtx.filter = tint;
+      }
+      targetCtx.translate(facing < 0 ? x + w : x, drawY);
+      targetCtx.scale(facing < 0 ? -1 : 1, 1);
+      targetCtx.drawImage(img, 0, 0, img.naturalWidth || 576, img.naturalHeight || 720, 0, 0, w, h);
+      targetCtx.restore();
+      if (targetCtx === offscreenCtx) {
+        targetCtx.globalCompositeOperation = 'source-atop';
+        targetCtx.fillStyle = 'rgba(255,255,255,0.92)';
+        targetCtx.fillRect(x, drawY, w, h);
+        targetCtx.globalCompositeOperation = 'source-over';
+      }
+      if (isHero) {
+        targetCtx.fillStyle = 'rgba(255,215,0,0.8)';
+        targetCtx.fillRect(x + 16, drawY + 6, 24, 6);
+      }
+    }
 
+    function drawFighter(x, y, facing, tint, frameSet, frameIndex, isHero) {
+      drawFighterToContext(ctx, x, y, facing, tint, frameSet, frameIndex, isHero);
+      drawFighterToContext(collisionCtx, x, y, facing, tint, frameSet, frameIndex, isHero);
+    }
+
+    function spriteHasPixelAt(x, y) {
+      const data = collisionCtx.getImageData(Math.max(0, Math.floor(x)), Math.max(0, Math.floor(y)), 1, 1).data;
+      return data[3] > 0;
+    }
+
+    function drawScene() {
+      drawBackground();
       const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      collisionCtx.clearRect(0, 0, w, h);
+      drawFighter(playerX, playerY, playerDir, 'brightness(1.15) saturate(1.4)', heroFrames.idle, playerFrame, true);
+      const enemyTint = currentFight === 1 ? 'hue-rotate(185deg) saturate(1.2)' : currentFight === 2 ? 'hue-rotate(300deg) saturate(1.25)' : currentFight === 3 ? 'grayscale(0.15) brightness(0.8)' : 'hue-rotate(90deg) saturate(0.95)';
+      drawFighter(enemyX, enemyY, enemyDir, enemyTint, heroFrames.idle, enemyFrame, false);
 
-      vx = 0;
-      if (input.left) vx -= input.run ? 3.2 : 2;
-      if (input.right) vx += input.run ? 3.2 : 2;
-      x = Math.max(12, Math.min(w - 40, x + vx));
-
-      evx = x > ex ? 1.1 : -1.1;
-      ex += evx;
-      ex = Math.max(12, Math.min(w - 40, ex));
-
-      render();
-      requestAnimationFrame(loop);
+      ctx.fillStyle = 'rgba(255,255,255,0.16)';
+      ctx.font = 'bold 13px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText(roster[currentFight].name, enemyX + 10, h - 88);
+      ctx.fillText('TIGER BLAZE', playerX + 10, h - 88);
     }
 
-    function startGame() {
-      running = true;
-      ui.overlay.style.display = 'none';
-      score = 0;
-      timer = 99;
-      p1hp = 100;
-      p2hp = 100;
-      x = 70;
-      ex = 260;
-      updateHUD();
-      flash('READY!');
-      clearInterval(window._gameTimer);
-      window._gameTimer = setInterval(() => {
-        if (!running) return;
-        timer--;
-        updateHUD();
-        if (timer <= 0) {
-          running = false;
-          ui.overlay.style.display = 'flex';
-          ui.overlay.querySelector('h1').textContent = p1hp >= p2hp ? 'YOU WIN' : 'GAME OVER';
-          ui.overlay.querySelector('p').textContent = 'Touch PLAY to restart';
+    function startFight(index) {
+      currentFight = index;
+      fightActive = true;
+      playerHp = 100;
+      enemyHp = 100;
+      playerX = 72;
+      enemyX = 248;
+      playerY = 360;
+      enemyY = 360;
+      input = { left: false, right: false, guard: false, jump: false };
+      attackQueued = false;
+      specialQueued = false;
+      enemyAttackTimer = 0;
+      storyIndex = 0;
+      victorySeen = false;
+      updateBars();
+      renderRoster();
+      speak(roster[index].intro);
+      fightTimer = 0;
+    }
+
+    function endFight(result) {
+      fightActive = false;
+      if (result === 'win') {
+        const reward = roster[currentFight].unlock;
+        if (!unlocks.includes(reward)) unlocks.push(reward);
+        if (currentFight < roster.length - 1) {
+          endTitle.textContent = 'Fight won';
+          endText.innerHTML = `${roster[currentFight].name} falls. Unlock gained: <strong>${reward}</strong>.<br />Tap continue to face the next challenger.`;
+          nextBtn.onclick = () => {
+            endOverlay.style.display = 'none';
+            currentFight += 1;
+            startFight(currentFight);
+          };
+        } else {
+          endTitle.textContent = 'City saved';
+          endText.innerHTML = `Tiger Blaze stands tall. Unlocks: <strong>${unlocks.join(', ')}</strong><br />The street inferno is finally under control.`;
+          nextBtn.onclick = () => {
+            endOverlay.style.display = 'none';
+            startFight(0);
+          };
         }
-      }, 1000);
+      } else {
+        endTitle.textContent = 'The flame flickered';
+        endText.innerHTML = 'You fell in the arena. Restart the story and reclaim the night.';
+        nextBtn.onclick = () => {
+          endOverlay.style.display = 'none';
+          startFight(0);
+        };
+      }
+      endOverlay.style.display = 'flex';
+    }
+
+    function updateFight(dt) {
+      if (!fightActive) return;
+      fightTimer += dt;
+      const w = canvas.clientWidth;
+      if (input.left) { playerX -= 2.6; playerDir = -1; }
+      if (input.right) { playerX += 2.6; playerDir = 1; }
+      playerX = Math.max(26, Math.min(w - 108, playerX));
+
+      enemyAttackTimer += dt;
+      if (enemyAttackTimer > 900) {
+        enemyAttackTimer = 0;
+        if (Math.abs(playerX - enemyX) < 96) {
+          playerHp = Math.max(0, playerHp - 8);
+          speak(`${roster[currentFight].name}: ${['You are still too slow.', 'This city belongs to the night.', 'Your flame is fading.'][Math.floor(Math.random() * 3)]}`);
+        }
+      }
+
+      if (attackQueued) {
+        attackQueued = false;
+        const hitPointX = playerDir > 0 ? playerX + 84 : playerX + 8;
+        const hitPointY = playerY - 44;
+        const enemyHit = spriteHasPixelAt(hitPointX, hitPointY) || Math.abs(playerX - enemyX) < 96;
+        if (enemyHit) {
+          enemyHp = Math.max(0, enemyHp - 12);
+          speak(`Tiger Blaze: ${['Burn!', 'Street inferno!', 'Flame on!'][Math.floor(Math.random() * 3)]}`);
+        }
+      }
+
+      if (specialQueued) {
+        specialQueued = false;
+        const hitPointX = playerDir > 0 ? playerX + 90 : playerX + 8;
+        const hitPointY = playerY - 72;
+        const enemyHit = spriteHasPixelAt(hitPointX, hitPointY) || Math.abs(playerX - enemyX) < 110;
+        if (enemyHit) {
+          enemyHp = Math.max(0, enemyHp - 24);
+          speak('Tiger Blaze: Inferno burst!');
+        }
+      }
+
+      if (playerHp <= 0) endFight('lose');
+      if (enemyHp <= 0) endFight('win');
+
+      playerFrameTimer += dt;
+      if (playerFrameTimer > 90) {
+        playerFrameTimer = 0;
+        playerFrame += 1;
+      }
+      enemyFrameTimer += dt;
+      if (enemyFrameTimer > 92) {
+        enemyFrameTimer = 0;
+        enemyFrame += 1;
+      }
+
+      updateBars();
+    }
+
+    function loop(ts) {
+      if (!lastTs) lastTs = ts;
+      const dt = Math.min(40, ts - lastTs);
+      lastTs = ts;
+      updateFight(dt);
+      drawScene();
       requestAnimationFrame(loop);
     }
 
-    function bindTouch(id, onDown, onUp) {
-      const el = document.getElementById(id);
-      el.ontouchstart = e => { e.preventDefault(); el.classList.add('on'); onDown(); };
-      el.ontouchend = e => { e.preventDefault(); el.classList.remove('on'); onUp && onUp(); };
-      el.ontouchcancel = () => { el.classList.remove('on'); onUp && onUp(); };
-      el.ontouchmove = e => { e.preventDefault(); };
+    let lastTs = 0;
+
+    function bindTouch(element, onDown, onUp) {
+      const el = document.getElementById(element);
+      el.addEventListener('touchstart', (e) => { e.preventDefault(); el.classList.add('active'); onDown && onDown(); }, { passive: false });
+      el.addEventListener('touchend', (e) => { e.preventDefault(); el.classList.remove('active'); onUp && onUp(); }, { passive: false });
+      el.addEventListener('touchcancel', () => { el.classList.remove('active'); onUp && onUp(); });
     }
 
-    bindTouch('left', () => input.left = true, () => input.left = false);
-    bindTouch('right', () => input.right = true, () => input.right = false);
-    bindTouch('runBtn', () => input.run = true, () => input.run = false);
+    bindTouch('leftBtn', () => input.left = true, () => input.left = false);
+    bindTouch('rightBtn', () => input.right = true, () => input.right = false);
+    bindTouch('attackBtn', () => attackQueued = true);
+    bindTouch('specialBtn', () => specialQueued = true);
+    bindTouch('jumpBtn', () => { input.jump = true; speak('Tiger Blaze: The sky is mine.'); }, () => input.jump = false);
+    bindTouch('guardBtn', () => { input.guard = true; speak('Tiger Blaze: Guard the flame.'); }, () => input.guard = false);
 
-    document.getElementById('up').ontouchstart = e => {
-      e.preventDefault();
-      flash('JUMP');
-    };
-    document.getElementById('up').ontouchmove = e => {
-      e.preventDefault();
-      const t = e.touches[0];
-      if (!t) return;
-      const dy = t.clientY - (window._touchY || t.clientY);
-      if (dy < -24) flash('SPECIAL UP');
-    };
-    document.getElementById('down').ontouchstart = e => {
-      e.preventDefault();
-      flash('DUCK');
-    };
-    document.getElementById('down').ontouchmove = e => {
-      e.preventDefault();
-      const t = e.touches[0];
-      if (!t) return;
-      const dy = t.clientY - (window._touchY || t.clientY);
-      if (dy > 24) flash('SPECIAL DOWN');
-    };
-
-    document.getElementById('up').ontouchstart = e => { e.preventDefault(); window._touchY = e.touches[0].clientY; flash('JUMP'); };
-    document.getElementById('down').ontouchstart = e => { e.preventDefault(); window._touchY = e.touches[0].clientY; flash('DUCK'); };
-
-    document.getElementById('attackBtn').ontouchstart = e => {
-      e.preventDefault();
-      if (!running) return;
-      const hit = Math.random() > 0.35;
-      if (hit) {
-        p2hp = Math.max(0, p2hp - 8);
-        score += 80;
-        flash('HIT!');
-      } else {
-        flash('MISS');
-      }
-      updateHUD();
-    };
-
-    ui.playBtn.ontouchstart = e => { e.preventDefault(); startGame(); };
-    ui.playBtn.ontouchmove = e => { e.preventDefault(); };
-
-    document.addEventListener('touchstart', () => {
-      const el = document.documentElement;
-      if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
-      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    }, { once:true, passive:true });
+    startBtn.addEventListener('touchstart', (e) => { e.preventDefault(); introOverlay.style.display = 'none'; startFight(0); renderRoster(); }, { passive: false });
+    nextBtn.addEventListener('touchstart', (e) => { e.preventDefault(); endOverlay.style.display = 'none'; startFight(0); }, { passive: false });
 
     (async () => {
-      await preloadSprites();
-      updateHUD();
-      render();
+      await preloadAssets();
+      renderRoster();
+      drawScene();
+      requestAnimationFrame(loop);
     })();
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then((registration) => {
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        })
-        .catch((error) => {
-          console.log('ServiceWorker registration failed: ', error);
-        });
-    });
-  }
-</script>
+  </script>
 </body>
 </html>
