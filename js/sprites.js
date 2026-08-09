@@ -24,29 +24,15 @@ export const ACTIONS = {
   victory:   13,
 };
 
-// ── ANIM_DEFS ─────────────────────────────────────────
-// mode:'fighter'  → draw sprite at fighter position
-// mode:'scene'    → play fullscreen video overlay
-export const ANIM_DEFS = {
-  // ── Idle / locomotion ─────────────────────────────
-  idle:       { action:'idle',       fps:8,  loop:true,  mode:'fighter' },
-  walk:       { action:'walk',       fps:8,  loop:true,  mode:'fighter' },
-  run:        { action:'run',        fps:12, loop:true,  mode:'fighter' },
-  jump:       { action:'jump',       fps:10, loop:false, mode:'fighter' },
-
-  // ── Normal attacks — combo chain ──────────────────
-  // Melee tap 1:  JAB   (3 frames, blazeGain:8)
-  // Melee tap 2:  CROSS (6 frames, blazeGain:13)
-  // Melee tap 3:  PUNCH (6 frames, blazeGain:16)
   // Melee tap 4:  UPPERCUT (7 frames, blazeGain:20)
   // Melee tap 5+: HEADBUTT or ROUNDHOUSE alternating
-  jab:        { action:'jab',        fps:16, loop:false, mode:'fighter', dmg:8,  blaze:8  },
-  cross:      { action:'cross',      fps:14, loop:false, mode:'fighter', dmg:12, blaze:13 },
-  punch:      { action:'punch',      fps:13, loop:false, mode:'fighter', dmg:15, blaze:16 },
-  uppercut:   { action:'uppercut',   fps:14, loop:false, mode:'fighter', dmg:20, blaze:20 },
-  headbutt:   { action:'headbutt',   fps:12, loop:false, mode:'fighter', dmg:18, blaze:18 },
-  kick:       { action:'kick',       fps:12, loop:false, mode:'fighter', dmg:14, blaze:14 },
-  roundhouse: { action:'roundhouse', fps:12, loop:false, mode:'fighter', dmg:22, blaze:22 },
+  jab:        { action:'jab',        fps:16, loop:false, mode:'fighter', frameCount:3, dmg:8,  blaze:8  },
+  cross:      { action:'cross',      fps:14, loop:false, mode:'fighter', frameCount:6, dmg:12, blaze:13 },
+  punch:      { action:'punch',      fps:13, loop:false, mode:'fighter', frameCount:6, dmg:15, blaze:16 },
+  uppercut:   { action:'uppercut',   fps:14, loop:false, mode:'fighter', frameCount:7, dmg:20, blaze:20 },
+  headbutt:   { action:'headbutt',   fps:12, loop:false, mode:'fighter', frameCount:11, dmg:18, blaze:18 },
+  kick:       { action:'kick',       fps:12, loop:false, mode:'fighter', frameCount:6, dmg:14, blaze:14 },
+  roundhouse: { action:'roundhouse', fps:12, loop:false, mode:'fighter', frameCount:7, dmg:22, blaze:22 },
 
   // ── Victory ───────────────────────────────────────
   victory:    { action:'victory',    fps:8,  loop:true,  mode:'fighter' },

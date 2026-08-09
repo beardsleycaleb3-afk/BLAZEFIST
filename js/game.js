@@ -43,9 +43,12 @@ export class Game {
     this._sceneActive = false;
     this._sceneDmg    = 0;
     this._sceneHit    = false;
+    this._queuedScene = null;
+    this._queuedDmg   = 0;
 
     this.input = { left:false, right:false, run:false, duck:false };
   }
+
 
   // ── Round start / reset ───────────────────────────
   startRound() {
@@ -144,7 +147,7 @@ export class Game {
       P.state    = inp.run ? 'run' : 'walk';
     } else {
       P.vx    = 0;
-      P.state = P.fireMode ? 'idle' : 'idle';
+      P.state = 'idle';
     }
     P.x = clamp(P.x + P.vx, 22, W - 22);
   }
@@ -253,7 +256,7 @@ export class Game {
 
     setTimeout(() => {
       P.attacking = false;
-      P.state     = P.fireMode ? 'idle' : 'idle';
+      P.state     = 'idle';
     }, dur);
   }
 
@@ -290,7 +293,7 @@ export class Game {
     this.renderer.endScene();
     this.hud.setCutscene(false);
     this.player.attacking = false;
-    this.player.state     = this.player.fireMode ? 'idle' : 'idle';
+    this.player.state     = 'idle';
 
     // Chain queued scene (ultimate after tiger)
     if (this._queuedScene && this.enemy.hp > 0) {

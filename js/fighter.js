@@ -3,6 +3,8 @@
 // │  Holds position, HP, anim state, physics         │
 // └──────────────────────────────────────────────────┘
 
+import { ACTIONS } from './sprites.js';
+
 export class Fighter {
   constructor(role, x, y) {
     this.role     = role;
@@ -48,8 +50,8 @@ export class Fighter {
     if (this.frameT >= ft) {
       this.frameT = 0;
       this.frame++;
-      // Frame count from ACTIONS map via def.frameCount, or fallback
-      const total = def.frameCount ?? 8;
+      // Frame count from ACTIONS map via def.action lookup
+      let total = ACTIONS[def.action] ?? 8;
       if (this.frame >= total) {
         this.frame = def.loop ? 0 : total - 1;
       }
