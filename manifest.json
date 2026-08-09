@@ -1,6 +1,6 @@
 {
-  "name": "Fight Game PWA",
-  "short_name": "Fight",
+  "name": "fight",
+  "short_name": "fight",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#000000",
