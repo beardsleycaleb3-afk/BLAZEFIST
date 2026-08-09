@@ -1,282 +1,113 @@
-const CACHE_NAME = 'fight-game-assets-v5';
-const ASSETS_TO_CACHE = [
+// sw.js - Service Worker handling asset caching, offline intercept, and sequenced offscreen canvas pre-rendering
+const CACHE_NAME = 'fight-v7';
+
+const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './styles.css',
   './sw.js',
-  
-  // Backgrounds
-  './assets/sprites/stages/backgrounds/stage1.png',
-  './assets/sprites/stages/backgrounds/stage2.png',
-  './assets/sprites/stages/backgrounds/stage3.png',
-  './assets/sprites/stages/backgrounds/stage4.png',
-  './assets/sprites/stages/backgrounds/stage5.png',
-  './assets/sprites/stages/backgrounds/stage6.png',
-  './assets/sprites/stages/backgrounds/stage7.png',
-  './assets/sprites/stages/backgrounds/stage8.png',
-  './assets/sprites/stages/backgrounds/stage9.png',
-
-  // ---------------------------------------------------------------------------
-  // 1. assets/sprites/fighter/east/ (Videos & Subfolders)
-  // ---------------------------------------------------------------------------
-  './assets/sprites/fighter/east/32hitnormal.mp4',
-  './assets/sprites/fighter/east/fireset1.mp4',
-  './assets/sprites/fighter/east/fireset2.mp4',
-  './assets/sprites/fighter/east/fireset3.mp4',
-  './assets/sprites/fighter/east/fireset4.mp4',
-  './assets/sprites/fighter/east/normalrun.mp4',
-  './assets/sprites/fighter/east/tigerset1.mp4',
-  './assets/sprites/fighter/east/ultimatetiger.mp4',
-
-  // East - cross
-  './assets/sprites/fighter/east/cross/frame_000.png',
-  './assets/sprites/fighter/east/cross/frame_001.png',
-  './assets/sprites/fighter/east/cross/frame_002.png',
-  './assets/sprites/fighter/east/cross/frame_003.png',
-  './assets/sprites/fighter/east/cross/frame_004.png',
-  './assets/sprites/fighter/east/cross/frame_005.png',
-
-  // East - crouch
-  './assets/sprites/fighter/east/crouch/frame_000.png',
-  './assets/sprites/fighter/east/crouch/frame_001.png',
-  './assets/sprites/fighter/east/crouch/frame_002.png',
-  './assets/sprites/fighter/east/crouch/frame_003.png',
-  './assets/sprites/fighter/east/crouch/frame_004.png',
-  './assets/sprites/fighter/east/crouch/frame_005.png',
-
-  // East - die
-  './assets/sprites/fighter/east/die/frame_000.png',
-  './assets/sprites/fighter/east/die/frame_001.png',
-  './assets/sprites/fighter/east/die/frame_002.png',
-  './assets/sprites/fighter/east/die/frame_003.png',
-  './assets/sprites/fighter/east/die/frame_004.png',
-  './assets/sprites/fighter/east/die/frame_005.png',
-
-  // East - fireball
-  './assets/sprites/fighter/east/fireball/frame_000.png',
-  './assets/sprites/fighter/east/fireball/frame_001.png',
-  './assets/sprites/fighter/east/fireball/frame_002.png',
-  './assets/sprites/fighter/east/fireball/frame_003.png',
-  './assets/sprites/fighter/east/fireball/frame_004.png',
-  './assets/sprites/fighter/east/fireball/frame_005.png',
-
-  // East - getup
-  './assets/sprites/fighter/east/getup/frame_000.png',
-  './assets/sprites/fighter/east/getup/frame_001.png',
-  './assets/sprites/fighter/east/getup/frame_002.png',
-  './assets/sprites/fighter/east/getup/frame_003.png',
-  './assets/sprites/fighter/east/getup/frame_004.png',
-  './assets/sprites/fighter/east/getup/frame_005.png',
-
-  // East - idle
-  './assets/sprites/fighter/east/idle/frame_000.png',
-  './assets/sprites/fighter/east/idle/frame_001.png',
-  './assets/sprites/fighter/east/idle/frame_002.png',
-  './assets/sprites/fighter/east/idle/frame_003.png',
-  './assets/sprites/fighter/east/idle/frame_004.png',
-  './assets/sprites/fighter/east/idle/frame_005.png',
-  './assets/sprites/fighter/east/idle/frame_006.png',
-  './assets/sprites/fighter/east/idle/frame_007.png',
-
-  // East - jab
-  './assets/sprites/fighter/east/jab/frame_000.png',
-  './assets/sprites/fighter/east/jab/frame_001.png',
-  './assets/sprites/fighter/east/jab/frame_002.png',
-
-  // East - kick
-  './assets/sprites/fighter/east/kick/frame_000.png',
-  './assets/sprites/fighter/east/kick/frame_001.png',
-  './assets/sprites/fighter/east/kick/frame_002.png',
-  './assets/sprites/fighter/east/kick/frame_003.png',
-  './assets/sprites/fighter/east/kick/frame_004.png',
-  './assets/sprites/fighter/east/kick/frame_005.png',
-
-  // East - run
-  './assets/sprites/fighter/east/run/frame_000.png',
-  './assets/sprites/fighter/east/run/frame_001.png',
-  './assets/sprites/fighter/east/run/frame_002.png',
-  './assets/sprites/fighter/east/run/frame_003.png',
-  './assets/sprites/fighter/east/run/frame_004.png',
-  './assets/sprites/fighter/east/run/frame_005.png',
-  './assets/sprites/fighter/east/run/frame_006.png',
-  './assets/sprites/fighter/east/run/frame_007.png',
-
-  // East - takehit
-  './assets/sprites/fighter/east/takehit/frame_000.png',
-  './assets/sprites/fighter/east/takehit/frame_001.png',
-  './assets/sprites/fighter/east/takehit/frame_002.png',
-  './assets/sprites/fighter/east/takehit/frame_003.png',
-  './assets/sprites/fighter/east/takehit/frame_004.png',
-  './assets/sprites/fighter/east/takehit/frame_005.png',
-
-  // East - throw
-  './assets/sprites/fighter/east/throw/frame_000.png',
-  './assets/sprites/fighter/east/throw/frame_001.png',
-  './assets/sprites/fighter/east/throw/frame_002.png',
-  './assets/sprites/fighter/east/throw/frame_003.png',
-  './assets/sprites/fighter/east/throw/frame_004.png',
-  './assets/sprites/fighter/east/throw/frame_005.png',
-
-  // East - transform
-  './assets/sprites/fighter/east/transform/frame_000.png',
-  './assets/sprites/fighter/east/transform/frame_001.png',
-  './assets/sprites/fighter/east/transform/frame_002.png',
-  './assets/sprites/fighter/east/transform/frame_003.png',
-  './assets/sprites/fighter/east/transform/frame_004.png',
-  './assets/sprites/fighter/east/transform/frame_005.png',
-
-  // East - uppercut
-  './assets/sprites/fighter/east/uppercut/frame_000.png',
-  './assets/sprites/fighter/east/uppercut/frame_001.png',
-  './assets/sprites/fighter/east/uppercut/frame_002.png',
-  './assets/sprites/fighter/east/uppercut/frame_003.png',
-  './assets/sprites/fighter/east/uppercut/frame_004.png',
-  './assets/sprites/fighter/east/uppercut/frame_005.png',
-  './assets/sprites/fighter/east/uppercut/frame_006.png',
-
-  // ---------------------------------------------------------------------------
-  // 2. assets/sprites/fighter/flaming/east/ (Subfolders)
-  // ---------------------------------------------------------------------------
-  // Flaming East - cross
-  './assets/sprites/fighter/flaming/east/cross/frame_000.png',
-  './assets/sprites/fighter/flaming/east/cross/frame_001.png',
-  './assets/sprites/fighter/flaming/east/cross/frame_002.png',
-  './assets/sprites/fighter/flaming/east/cross/frame_003.png',
-  './assets/sprites/fighter/flaming/east/cross/frame_004.png',
-  './assets/sprites/fighter/flaming/east/cross/frame_005.png',
-
-  // Flaming East - headbutt
-  './assets/sprites/fighter/flaming/east/headbutt/frame_000.png',
-  './assets/sprites/fighter/flaming/east/headbutt/frame_001.png',
-  './assets/sprites/fighter/flaming/east/headbutt/frame_002.png',
-  './assets/sprites/fighter/flaming/east/headbutt/frame_003.png',
-  './assets/sprites/fighter/flaming/east/headbutt/frame_004.png',
-  './assets/sprites/fighter/flaming/east/headbutt/frame_005.png',
-  './assets/sprites/fighter/flaming/east/headbutt/frame_006.png',
-  './assets/sprites/fighter/flaming/east/headbutt/frame_007.png',
-  './assets/sprites/fighter/flaming/east/headbutt/frame_008.png',
-  './assets/sprites/fighter/flaming/east/headbutt/frame_009.png',
-  './assets/sprites/fighter/flaming/east/headbutt/frame_010.png',
-
-  // Flaming East - idle
-  './assets/sprites/fighter/flaming/east/idle/frame_000.png',
-  './assets/sprites/fighter/flaming/east/idle/frame_001.png',
-  './assets/sprites/fighter/flaming/east/idle/frame_002.png',
-  './assets/sprites/fighter/flaming/east/idle/frame_003.png',
-  './assets/sprites/fighter/flaming/east/idle/frame_004.png',
-  './assets/sprites/fighter/flaming/east/idle/frame_005.png',
-  './assets/sprites/fighter/flaming/east/idle/frame_006.png',
-  './assets/sprites/fighter/flaming/east/idle/frame_007.png',
-
-  // Flaming East - jab
-  './assets/sprites/fighter/flaming/east/jab/frame_000.png',
-  './assets/sprites/fighter/flaming/east/jab/frame_001.png',
-  './assets/sprites/fighter/flaming/east/jab/frame_002.png',
-
-  // Flaming East - jump
-  './assets/sprites/fighter/flaming/east/jump/frame_000.png',
-  './assets/sprites/fighter/flaming/east/jump/frame_001.png',
-  './assets/sprites/fighter/flaming/east/jump/frame_002.png',
-  './assets/sprites/fighter/flaming/east/jump/frame_003.png',
-  './assets/sprites/fighter/flaming/east/jump/frame_004.png',
-  './assets/sprites/fighter/flaming/east/jump/frame_005.png',
-  './assets/sprites/fighter/flaming/east/jump/frame_006.png',
-  './assets/sprites/fighter/flaming/east/jump/frame_007.png',
-
-  // Flaming East - kick
-  './assets/sprites/fighter/flaming/east/kick/frame_000.png',
-  './assets/sprites/fighter/flaming/east/kick/frame_001.png',
-  './assets/sprites/fighter/flaming/east/kick/frame_002.png',
-  './assets/sprites/fighter/flaming/east/kick/frame_003.png',
-  './assets/sprites/fighter/flaming/east/kick/frame_004.png',
-  './assets/sprites/fighter/flaming/east/kick/frame_005.png',
-
-  // Flaming East - punch
-  './assets/sprites/fighter/flaming/east/punch/frame_000.png',
-  './assets/sprites/fighter/flaming/east/punch/frame_001.png',
-  './assets/sprites/fighter/flaming/east/punch/frame_002.png',
-  './assets/sprites/fighter/flaming/east/punch/frame_003.png',
-  './assets/sprites/fighter/flaming/east/punch/frame_004.png',
-  './assets/sprites/fighter/flaming/east/punch/frame_005.png',
-
-  // Flaming East - roundhouse
-  './assets/sprites/fighter/flaming/east/roundhouse/frame_000.png',
-  './assets/sprites/fighter/flaming/east/roundhouse/frame_001.png',
-  './assets/sprites/fighter/flaming/east/roundhouse/frame_002.png',
-  './assets/sprites/fighter/flaming/east/roundhouse/frame_003.png',
-  './assets/sprites/fighter/flaming/east/roundhouse/frame_004.png',
-  './assets/sprites/fighter/flaming/east/roundhouse/frame_005.png',
-  './assets/sprites/fighter/flaming/east/roundhouse/frame_006.png',
-
-  // Flaming East - run
-  './assets/sprites/fighter/flaming/east/run/frame_000.png',
-  './assets/sprites/fighter/flaming/east/run/frame_001.png',
-  './assets/sprites/fighter/flaming/east/run/frame_002.png',
-  './assets/sprites/fighter/flaming/east/run/frame_003.png',
-  './assets/sprites/fighter/flaming/east/run/frame_004.png',
-  './assets/sprites/fighter/flaming/east/run/frame_005.png',
-  './assets/sprites/fighter/flaming/east/run/frame_006.png',
-  './assets/sprites/fighter/flaming/east/run/frame_007.png',
-
-  // Flaming East - uppercut
-  './assets/sprites/fighter/flaming/east/uppercut/frame_000.png',
-  './assets/sprites/fighter/flaming/east/uppercut/frame_001.png',
-  './assets/sprites/fighter/flaming/east/uppercut/frame_002.png',
-  './assets/sprites/fighter/flaming/east/uppercut/frame_003.png',
-  './assets/sprites/fighter/flaming/east/uppercut/frame_004.png',
-  './assets/sprites/fighter/flaming/east/uppercut/frame_005.png',
-  './assets/sprites/fighter/flaming/east/uppercut/frame_006.png',
-
-  // Flaming East - victory
-  './assets/sprites/fighter/flaming/east/victory/frame_000.png',
-  './assets/sprites/fighter/flaming/east/victory/frame_001.png',
-  './assets/sprites/fighter/flaming/east/victory/frame_002.png',
-  './assets/sprites/fighter/flaming/east/victory/frame_003.png',
-  './assets/sprites/fighter/flaming/east/victory/frame_004.png',
-  './assets/sprites/fighter/flaming/east/victory/frame_005.png',
-  './assets/sprites/fighter/flaming/east/victory/frame_006.png',
-  './assets/sprites/fighter/flaming/east/victory/frame_007.png',
-  './assets/sprites/fighter/flaming/east/victory/frame_008.png',
-  './assets/sprites/fighter/flaming/east/victory/frame_009.png',
-  './assets/sprites/fighter/flaming/east/victory/frame_010.png',
-  './assets/sprites/fighter/flaming/east/victory/frame_011.png',
-  './assets/sprites/fighter/flaming/east/victory/frame_012.png',
-
-  // Flaming East - walk
-  './assets/sprites/fighter/flaming/east/walk/frame_000.png',
-  './assets/sprites/fighter/flaming/east/walk/frame_001.png',
-  './assets/sprites/fighter/flaming/east/walk/frame_002.png',
-  './assets/sprites/fighter/flaming/east/walk/frame_003.png',
-  './assets/sprites/fighter/flaming/east/walk/frame_004.png',
-  './assets/sprites/fighter/flaming/east/walk/frame_005.png',
-  './assets/sprites/fighter/flaming/east/walk/frame_006.png',
-  './assets/sprites/fighter/flaming/east/walk/frame_007.png',
-
-  // ---------------------------------------------------------------------------
-  // 3. Animation Sheets
-  // ---------------------------------------------------------------------------
-  './assets/sprites/animations/dragonhumansheet.png',
-  './assets/sprites/animations/electrichumansheet.png',
-  './assets/sprites/animations/electrichumansheet2.png',
-  './assets/sprites/animations/electricrhinosheet.png',
-  './assets/sprites/animations/elementalowlsheet.png',
-  './assets/sprites/animations/elementalratsheet.png',
-  './assets/sprites/animations/rathumansheet.png',
-  './assets/sprites/animations/ratshadow2sheet.png',
-  './assets/sprites/animations/ratsheet.png',
-  './assets/sprites/animations/rhinohumansheet.png',
-  './assets/sprites/animations/rhinohumansheet2.png',
-  './assets/sprites/animations/rhinosheet.png',
-  './assets/sprites/animations/shadowratsheet2.png'
+  './worker.js',
+  './icon-192.png',
+  './icon-512.png',
+  './favicon.png'
 ];
+
+const DIRECTORY_MAPPINGS = {
+  backgrounds: { path: './assets/sprites/stages/backgrounds/stage', count: 9, ext: '.png' },
+  animations: [
+    'dragonhumansheet', 'electrichumansheet', 'electrichumansheet2', 
+    'electricrhinosheet', 'elementalowlsheet', 'elementalratsheet', 
+    'rathumansheet', 'ratshadow2sheet', 'ratsheet', 'rhinohumansheet', 
+    'rhinohumansheet2', 'rhinosheet', 'shadowratsheet2'
+  ],
+  flamingVideos: [
+    '32hitnormal', 'fireset1', 'fireset2', 'fireset3', 
+    'fireset4', 'normalrun', 'tigerset1', 'ultimatetiger'
+  ],
+  fighterEast: {
+    base: './assets/sprites/fighter/east/',
+    sequences: {
+      cross: 6, crouch: 6, die: 6, fireball: 6, getup: 6,
+      idle: 8, jab: 3, kick: 6, run: 8, takehit: 6,
+      throw: 6, transform: 6, uppercut: 7
+    }
+  },
+  flamingEast: {
+    base: './assets/sprites/fighter/flaming/east/',
+    sequences: {
+      cross: 6, headbutt: 11, idle: 8, jab: 3, jump: 8,
+      kick: 6, punch: 6, roundhouse: 7, run: 8, uppercut: 7,
+      victory: 13, walk: 8
+    }
+  }
+};
+
+function generateMappedAssetList() {
+  const assets = [...CORE_ASSETS];
+
+  for (let i = 1; i <= DIRECTORY_MAPPINGS.backgrounds.count; i++) {
+    assets.push(`${DIRECTORY_MAPPINGS.backgrounds.path}${i}${DIRECTORY_MAPPINGS.backgrounds.ext}`);
+  }
+
+  DIRECTORY_MAPPINGS.animations.forEach(name => {
+    assets.push(`./assets/sprites/animations/${name}.png`);
+  });
+
+  DIRECTORY_MAPPINGS.flamingVideos.forEach(name => {
+    assets.push(`./assets/sprites/fighter/flaming/${name}.mp4`);
+  });
+
+  const east = DIRECTORY_MAPPINGS.fighterEast;
+  for (const [anim, count] of Object.entries(east.sequences)) {
+    for (let i = 0; i < count; i++) {
+      const frameNum = String(i).padStart(3, '0');
+      assets.push(`${east.base}${anim}/frame_${frameNum}.png`);
+    }
+  }
+
+  const flamingEast = DIRECTORY_MAPPINGS.flamingEast;
+  for (const [anim, count] of Object.entries(flamingEast.sequences)) {
+    for (let i = 0; i < count; i++) {
+      const frameNum = String(i).padStart(3, '0');
+      assets.push(`${flamingEast.base}${anim}/frame_${frameNum}.png`);
+    }
+  }
+
+  return assets;
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    }).then(() => {
-      return self.skipWaiting();
-    })
+    caches.open(CACHE_NAME).then(async (cache) => {
+      const allAssets = generateMappedAssetList();
+      const CHUNK_SIZE = 10;
+
+      for (let i = 0; i < allAssets.length; i += CHUNK_SIZE) {
+        const chunk = allAssets.slice(i, i + CHUNK_SIZE);
+        
+        await Promise.all(
+          chunk.map(async (url) => {
+            try {
+              const response = await fetch(url);
+              if (response.ok) {
+                if (url.endsWith('.png') && 'OffscreenCanvas' in self) {
+                  try {
+                    const blob = await response.blob();
+                    const bitmap = await createImageBitmap(blob);
+                    const offscreen = new OffscreenCanvas(bitmap.width, bitmap.height);
+                    const ctx = offscreen.getContext('2d');
+                    ctx.drawImage(bitmap, 0, 0);
+                    bitmap.close();
+                  } catch (err) {}
+                }
+                await cache.put(url, response.clone());
+              }
+            } catch (err) {}
+          })
+        );
+      }
+    }).then(() => self.skipWaiting())
   );
 });
 
@@ -290,13 +121,13 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    }).then(() => {
-      return self.clients.claim();
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -304,11 +135,15 @@ self.addEventListener('fetch', (event) => {
       }
       return fetch(event.request).then((networkResponse) => {
         return caches.open(CACHE_NAME).then((cache) => {
-          if (event.request.method === 'GET' && networkResponse.status === 200) {
+          if (networkResponse.status === 200) {
             cache.put(event.request, networkResponse.clone());
           }
           return networkResponse;
         });
+      }).catch(() => {
+        if (event.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
       });
     })
   );
