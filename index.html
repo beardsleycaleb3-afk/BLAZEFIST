@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#08101f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="tapout – touch-only mobile fighting game">
+  <title>tapout</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+
+  <div id="app">
+
+    <!-- ══ TOPBAR ══════════════════════════════════════════ -->
+    <header id="topbar">
+      <span class="brand">TAPOUT</span>
+      <span class="hud-chips">
+        <span class="chip">RD <span id="uiRound">1</span></span>
+        <span class="chip">SC <span id="uiScore">0</span></span>
+        <span class="chip fps-chip">FPS <span id="uiFps">60</span></span>
+      </span>
+    </header>
+
+    <!-- ══ SCREEN FRAME (bezel + monitor) ══════════════════ -->
+    <div id="screenFrame">
+
+      <!-- Loading overlay -->
+      <div id="loadScreen">
+        <div class="load-logo">TAPOUT</div>
+        <div class="load-track"><div id="loadBar"></div></div>
+        <div id="loadText">Initializing…</div>
+      </div>
+
+      <!-- Game canvas – 320×300 CSS, 350×300 design space -->
+      <canvas id="gameCanvas" aria-label="game screen"></canvas>
+
+    </div><!-- /screenFrame -->
+
+    <!-- ══ CONTROLS (150 px+ zone) ═════════════════════════ -->
+    <div id="controls">
+
+      <!-- LEFT: Classic D-Pad 120×120 NSEW cross -->
+      <div id="dpad" aria-label="directional pad">
+        <!-- Row 1 -->
+        <div class="dp-corner"></div>
+        <div class="dp-n dp-face" data-dir="up">▲</div>
+        <div class="dp-corner"></div>
+        <!-- Row 2 -->
+        <div class="dp-w dp-face" data-dir="left">◀</div>
+        <div class="dp-hub"></div>
+        <div class="dp-e dp-face" data-dir="right">▶</div>
+        <!-- Row 3 -->
+        <div class="dp-corner"></div>
+        <div class="dp-s dp-face" data-dir="down">▼</div>
+        <div class="dp-corner"></div>
+      </div>
+
+      <!-- SPACER -->
+      <div class="ctrl-gap"></div>
+
+      <!-- RIGHT: Action buttons -->
+      <div id="actionBtns">
+        <button id="btnMelee" class="act-btn btn-melee" type="button" aria-label="Melee">
+          <span class="btn-icon">🥊</span>
+          <span class="btn-label">MELEE</span>
+        </button>
+        <button id="btnRun" class="act-btn btn-run" type="button" aria-label="Run">
+          <span class="btn-icon">💨</span>
+          <span class="btn-label">RUN</span>
+        </button>
+      </div>
+
+    </div><!-- /controls -->
+
+  </div><!-- /app -->
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
