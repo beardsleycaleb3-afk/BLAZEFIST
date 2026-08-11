@@ -1,4 +1,4 @@
-// src/config.js
+// src/js/config.js
 // ════════════════════════════════════════════════════════════
 //  tapout — Central configuration
 //  Single source of truth for canvas dimensions, asset paths,
