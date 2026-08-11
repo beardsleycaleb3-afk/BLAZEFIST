@@ -1,4 +1,4 @@
-// src/loader.js
+// src/js/loader.js
 // ════════════════════════════════════════════════════════════
 //  tapout — Asset loader
 //
@@ -18,7 +18,7 @@ import {
   ENEMY_ANIMS,
   STAGE_NAMES,
   SHEET_NAMES,
-} from './config.js';
+} from './src/js/config.js';
 
 // ── Image cache — avoids duplicate fetches ────────────────────
 /** @type {Map<string, HTMLImageElement|null>} */
