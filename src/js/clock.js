@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-//  clock.js  —  Base Clock  |  BLAZEFIST Engine
+//  src/js/clock.js  —  Base Clock  |  BLAZEFIST Engine
 //  Foundation for all timing modules. Event-driven, composable.
 // ═══════════════════════════════════════════════════════════════
 
