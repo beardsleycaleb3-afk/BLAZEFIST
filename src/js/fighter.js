@@ -14,9 +14,9 @@
 //   • Horizontal clamp to stage bounds
 // ════════════════════════════════════════════════════════════
 
-import { DESIGN, PHYSICS, COMBAT } from './config.js';
-import { Animator }                from './animator.js';
-import { InputState, consumeJustPressed } from './input.js';
+import { DESIGN, PHYSICS, COMBAT } from './src/js/config.js';
+import { Animator }                from './src/js/animator.js';
+import { InputState, consumeJustPressed } from '.src/js/input.js';
 
 export class Fighter {
   /**
