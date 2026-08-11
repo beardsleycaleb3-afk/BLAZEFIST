@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FF6B00">
 <title>BLAZEFIST</title>
 <link rel="manifest" href="./manifest.json">
@@ -116,11 +114,11 @@ html,body{width:100dvw;height:100dvh;overflow:hidden;background:#000;font-family
 .abtn.pressed{transform:scale(0.88) translateY(2px);filter:brightness(1.35);}
 .bico{font-size:14px;line-height:1;}
 .bl2{font-size:4px;opacity:0.8;letter-spacing:1px;}
-#btn-punch{width:min(66px,16vw);height:min(66px,16vw);background:radial-gradient(circle at 35% 30%,#FF9900,#CC2200);box-shadow:0 4px 0 #881100,0 0 18px rgba(255,80,0,0.35);}
-#btn-kick{ width:min(62px,15vw);height:min(62px,15vw);background:radial-gradient(circle at 35% 30%,#00BBFF,#0033AA);box-shadow:0 4px 0 #001166,0 0 18px rgba(0,160,255,0.35);}
-#btn-jump{ width:min(54px,14vw);height:min(54px,14vw);background:radial-gradient(circle at 35% 30%,#FFEE44,#CC8800);box-shadow:0 4px 0 #664400,0 0 16px rgba(255,200,0,0.35);}
-#btn-sp{   width:min(54px,14vw);height:min(54px,14vw);background:radial-gradient(circle at 35% 30%,#DD44FF,#770099);box-shadow:0 4px 0 #440055,0 0 16px rgba(180,0,255,0.35);}
-#btn-blk{  width:min(48px,12vw);height:min(48px,12vw);background:radial-gradient(circle at 35% 30%,#888,#333);box-shadow:0 3px 0 #111,0 0 10px rgba(255,255,255,0.12);}
+#btn-punch{width:min(35px,16vw);height:min(35px,16vw);background:radial-gradient(circle at 35% 30%,#FF9900,#CC2200);box-shadow:0 4px 0 #881100,0 0 18px rgba(255,80,0,0.35);}
+#btn-kick{ width:min(35px,15vw);height:min(35px,15vw);background:radial-gradient(circle at 35% 30%,#00BBFF,#0033AA);box-shadow:0 4px 0 #001166,0 0 18px rgba(0,160,255,0.35);}
+#btn-jump{ width:min(35px,14vw);height:min(35px,14vw);background:radial-gradient(circle at 35% 30%,#FFEE44,#CC8800);box-shadow:0 4px 0 #664400,0 0 16px rgba(255,200,0,0.35);}
+#btn-sp{   width:min(35px,14vw);height:min(35px,14vw);background:radial-gradient(circle at 35% 30%,#DD44FF,#770099);box-shadow:0 4px 0 #440055,0 0 16px rgba(180,0,255,0.35);}
+#btn-blk{  width:min(35px,12vw);height:min(35px,12vw);background:radial-gradient(circle at 35% 30%,#888,#333);box-shadow:0 3px 0 #111,0 0 10px rgba(255,255,255,0.12);}
 </style>
 </head>
 <body>
@@ -128,7 +126,7 @@ html,body{width:100dvw;height:100dvh;overflow:hidden;background:#000;font-family
 <!-- LOADER -->
 <div id="loader">
   <h1>BLAZEFIST</h1>
-  <div class="load-sub">LOADING FROM GITHUB</div>
+  <div class="load-sub">LOADING</div>
   <div id="prog-wrap"><div id="prog-fill"></div></div>
   <div id="load-status">Initializing engine...</div>
   <div id="load-assets"></div>
@@ -137,7 +135,7 @@ html,body{width:100dvw;height:100dvh;overflow:hidden;background:#000;font-family
 <!-- GAME CANVAS -->
 <div id="scale-root">
   <div id="game-wrap">
-    <canvas id="game-canvas" width="768" height="512"></canvas>
+    <canvas id="game-canvas" width="320" height="300"></canvas>
     <div id="hud">
       <div class="panel pl">
         <div class="fname" id="p1-name">BLAZEFIST</div>
@@ -178,11 +176,11 @@ html,body{width:100dvw;height:100dvh;overflow:hidden;background:#000;font-family
   </div>
   <div id="btns">
     <div class="arow">
-      <div class="abtn" id="btn-jump"><span class="bico">↑</span><span class="bl2">JUMP</span></div>
+ 
       <div class="abtn" id="btn-sp"><span class="bico">✦</span><span class="bl2">SP</span></div>
     </div>
     <div class="arow">
-      <div class="abtn" id="btn-blk"><span class="bico">🛡</span><span class="bl2">BLK</span></div>
+
       <div class="abtn" id="btn-kick"><span class="bico">🦵</span><span class="bl2">KICK</span></div>
       <div class="abtn" id="btn-punch"><span class="bico">👊</span><span class="bl2">PUNCH</span></div>
     </div>
@@ -194,9 +192,9 @@ html,body{width:100dvw;height:100dvh;overflow:hidden;background:#000;font-family
 //  BLAZEFIST  index.html  —  ES Module Entry Point
 // ═══════════════════════════════════════════════════════════════
 import { UniversalClock, LAYER, PARSE_MODE }
-  from './assets/js/esmodules/universalclock.js';
+  from './src/js/universalclock.js';
 import { AnimDef }
-  from './assets/js/esmodules/playclock.js';
+  from './src/js/playclock.js';
 
 // ── Service Worker Registration ────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -206,7 +204,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // ── Constants ─────────────────────────────────────────────────
-const GH      = 'https://raw.githubusercontent.com/beardsleycaleb3-afk/fight/main/';
+const GH      = 'https://raw.githubusercontent.com/beardsleycaleb3-afk/BLAZEFIST/';
 const SP_BASE = GH + 'assets/sprites/fighter/';
 const BG_BASE = GH + 'assets/sprites/stages/backgrounds/';
 const MP4_32HIT = GH + 'assets/sprites/fighter/east/32hitnormal.mp4';
@@ -216,16 +214,16 @@ const NW = 768, NH = 512, GND = 370, GRAV = 0.56, JMP = -13.5;
 // ── Exact frame counts from repo screenshots ──────────────────
 const ANIM_DEFS_RAW = {
   // Normal fighter (east/)
-  n_idle:      { path:'east/idle',       n:null, fps:6,  loop:true  },
+  n_idle:      { path:'east/idle',       n:6, fps:6,  loop:true  },
   n_run:       { path:'east/run',        n:8,    fps:10, loop:true  },
-  n_crouch:    { path:'east/crouch',     n:null, fps:6,  loop:true  },
-  n_jab:       { path:'east/jab',        n:null, fps:14, loop:false },
+  n_crouch:    { path:'east/crouch',     n:3, fps:6,  loop:true  },
+  n_jab:       { path:'east/jab',        n:3, fps:14, loop:false },
   n_kick:      { path:'east/kick',       n:7,    fps:14, loop:false },
-  n_cross:     { path:'east/cross',      n:null, fps:14, loop:false },
+  n_cross:     { path:'east/cross',      n:7, fps:14, loop:false },
   n_uppercut:  { path:'east/uppercut',   n:7,    fps:16, loop:false },
-  n_fireball:  { path:'east/fireball',   n:null, fps:12, loop:false },
-  n_die:       { path:'east/die',        n:null, fps:8,  loop:false },
-  n_getup:     { path:'east/getup',      n:null, fps:8,  loop:false },
+  n_fireball:  { path:'east/fireball',   n:6, fps:12, loop:false },
+  n_die:       { path:'east/die',        n:6, fps:8,  loop:false },
+  n_getup:     { path:'east/getup',      n:6, fps:8,  loop:false },
   n_takehit:   { path:'east/takehit',    n:6,    fps:12, loop:false },
   n_throw:     { path:'east/throw',      n:7,    fps:12, loop:false },
   n_transform: { path:'east/transform',  n:13,   fps:10, loop:false },
@@ -417,7 +415,6 @@ wireBtn('btn-punch','punch',()=>{
 wireBtn('btn-kick','kick');
 wireBtn('btn-jump','up');
 wireBtn('btn-sp','sp');
-wireBtn('btn-blk','block');
 
 document.getElementById('restart-btn').addEventListener('touchstart',e=>{
   e.preventDefault(); if(state!=='fight') restart();
