@@ -1,4 +1,4 @@
-// src/renderer.js
+// src/js/renderer.js
 // ════════════════════════════════════════════════════════════
 //  tapout — Canvas Renderer
 //
