@@ -1,4 +1,4 @@
-// src/input.js
+// src/js/input.js
 // ════════════════════════════════════════════════════════════
 //  tapout — Touch-only input subsystem
 //
