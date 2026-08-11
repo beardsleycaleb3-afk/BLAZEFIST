@@ -1,4 +1,4 @@
-// src/hud.js
+// src/js/hud.js
 // ════════════════════════════════════════════════════════════
 //  tapout — In-canvas HUD
 //
@@ -8,7 +8,7 @@
 //  DOM chips (round, score, fps) are updated separately in main.js.
 // ════════════════════════════════════════════════════════════
 
-import { DESIGN } from './config.js';
+import { DESIGN } from './src/js/config.js';
 
 // ── Layout constants ─────────────────────────────────────────
 const BAR_W  = 108;
