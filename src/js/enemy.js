@@ -1,4 +1,4 @@
-// src/enemy.js
+// src/js/enemy.js
 // ════════════════════════════════════════════════════════════
 //  tapout — CPU-controlled Enemy
 //  Sprite set: assets/sprites/fighter/east/
@@ -15,15 +15,15 @@
 //   • isAttacking getter exposes hitbox state to main.js
 // ════════════════════════════════════════════════════════════
 
-import { DESIGN, PHYSICS } from './config.js';
-import { Animator }        from './animator.js';
+import { DESIGN, PHYSICS } from './src/js/config.js';
+import { Animator }        from './src/js/animator.js';
 
 // ── AI constants ──────────────────────────────────────────────
 const WALK_SPD      = 1.3;
 const APPROACH_DIST = 85;   // px  — stop approaching inside this
-const ATTACK_RATE   = 2000; // ms  — base interval between attacks
+const ATTACK_RATE   = 8000; // ms  — base interval between attacks
 const ATTACK_VAR    = 800;  // ms  — random variance on top
-const HIT_FLASH_MS  = 200;  // ms  — blink duration on takehit
+const HIT_FLASH_MS  = 10;  // ms  — blink duration on takehit
 
 // Attack pools
 const MELEE_SET  = ['jab', 'cross', 'kick', 'uppercut'];
