@@ -1,4 +1,4 @@
-// src/state.js
+// src/js/state.js
 // ════════════════════════════════════════════════════════════
 //  tapout — Game state machine
 //
