@@ -1,6 +1,6 @@
-// src/animator.js
+// src/js/animator.js
 // ════════════════════════════════════════════════════════════
-//  tapout — Animation state machine
+//  BLAZEFIST — Animation state machine
 //
 //  Drives frame index from config fps values.
 //  • play(name, opts) — switch animation; no-op if already active
@@ -10,7 +10,7 @@
 //  • Non-looping anims: freezes on last frame, fires onFinish callback.
 // ════════════════════════════════════════════════════════════
 
-import { PLAYER_ANIMS, ENEMY_ANIMS } from './config.js';
+import { PLAYER_ANIMS, ENEMY_ANIMS } from './src/js/config.js';
 
 export class Animator {
   /**
