@@ -1,4 +1,4 @@
-// src/fighter.js
+// src/js/fighter.js
 // ════════════════════════════════════════════════════════════
 //  tapout — Player-controlled Fighter
 //  Sprite set: assets/sprites/fighter/flaming/east/
