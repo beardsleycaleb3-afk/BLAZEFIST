@@ -1,4 +1,4 @@
-// src/gameloop.js
+// src/js/gameloop.js
 // ════════════════════════════════════════════════════════════
 //  tapout — Fixed-Timestep Game Loop
 //
