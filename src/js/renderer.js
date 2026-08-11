@@ -15,7 +15,7 @@
 //    drawStuff(r.ctx);              // draw in DESIGN coords
 // ════════════════════════════════════════════════════════════
 
-import { DESIGN } from './config.js';
+import { DESIGN } from './src/js/config.js';
 
 export class Renderer {
   /**
