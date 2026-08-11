@@ -1,4 +1,4 @@
-// src/main.js
+// src/js/main.js
 // ════════════════════════════════════════════════════════════
 //  tapout — Entry point
 //
@@ -16,16 +16,16 @@
 //      → game over  → reset()   → new Fighter + Enemy
 // ════════════════════════════════════════════════════════════
 
-import { loadAll }                   from './loader.js';
-import { initInput, destroyInput }   from './input.js';
-import { Fighter }                   from './fighter.js';
-import { Enemy }                     from './enemy.js';
-import { Stage }                     from './stage.js';
-import { Renderer }                  from './renderer.js';
-import { GameLoop }                  from './gameloop.js';
-import { GameState, Scene }          from './state.js';
-import { drawHUD }                   from './hud.js';
-import { DESIGN, COMBAT }            from './config.js';
+import { loadAll }                   from './src/js/loader.js';
+import { initInput, destroyInput }   from './src/js/input.js';
+import { Fighter }                   from './src/js/fighter.js';
+import { Enemy }                     from './src/js/enemy.js';
+import { Stage }                     from './src/js/stage.js';
+import { Renderer }                  from './src/js/renderer.js';
+import { GameLoop }                  from './src/js/gameloop.js';
+import { GameState, Scene }          from './src/js/state.js';
+import { drawHUD }                   from './src/js/hud.js';
+import { DESIGN, COMBAT }            from './src/js/config.js';
 
 // ════════════════════════════════════════════════════════════
 async function boot() {
@@ -205,7 +205,7 @@ async function boot() {
 // ════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   boot().catch((err) => {
-    console.error('[tapout] boot failed:', err);
+    console.error('[fight] boot failed:', err);
     const lt = document.getElementById('loadText');
     if (lt) lt.textContent = `Boot error: ${err.message}`;
   });
