@@ -1,11 +1,11 @@
-// src/stage.js
+// src/js/stage.js
 // ════════════════════════════════════════════════════════════
 //  tapout — Stage background renderer
 //  Manages which of the 9 stage backgrounds is active.
 //  Falls back to a gradient if the PNG hasn't loaded.
 // ════════════════════════════════════════════════════════════
 
-import { DESIGN, STAGE_NAMES } from './config.js';
+import { DESIGN, STAGE_NAMES } from './src/js/config.js';
 
 export class Stage {
   constructor() {
