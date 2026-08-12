@@ -17,6 +17,7 @@ const PRECACHE_URLS = [
   './index.html',
   './manifest.json',
   './src/js/clock.js',
+  './assets/sprites/
   './src/js/gameclock.js',
   './src/js/playclock.js',
   './src/js/universalclock.js',
